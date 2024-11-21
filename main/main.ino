@@ -1,3 +1,4 @@
+
 #include <Adafruit_NeoPixel.h>
 #include <Wire.h>
 #include "RTClib.h"
@@ -5,7 +6,6 @@
 #define PIN 25 // Pinnen vi bruker til Neopixlene
 // Det er en feil i biblioteket her på WOKWI så vi må simulere med 69 pixler
 #define NUMPIXELS 68 // Antall neopixler på en hel sirkel
-
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 RTC_DS1307 rtc;
@@ -23,6 +23,17 @@ bool erHelg = false;      // Blir True når det er helg
 byte gjeldende = 0;    // Gjeldende aktivitet, Aktiviteten som er akkurat nå
 byte forrige = 0;      // Forrige aktivitet, Aktiviteten vi hadde for 1 millisekund siden
 
+uint32_t fagFarge[10] = {
+  strip.Color(0, 0, 0), 
+  strip.Color(0,255,0),
+  strip.Color(102,205,170),
+  strip.Color(0,128,128),
+  strip.Color(205,92,92),
+  strip.Color(255,0,0),
+  strip.Color(60,179,113),
+  strip.Color(0,100,0),
+  strip.Color(188,143,143)
+};
 
 
 int igjen = 0;
@@ -48,6 +59,13 @@ void setup() {
 void loop() {
 
   // STILL KLOKKEN! Skriv "tid" for å stille
+
+  if (Serial.available()) {
+    String kommando = Serial.readStringUntil('\n');
+    if (kommando == "tid") {
+      stillKlokke();
+    }
+  }
 
 
   DateTime now = rtc.now();
@@ -138,5 +156,6 @@ void loop() {
   nedTelling(igjen, fagFarge[gjeldende]); 
 
   strip.show();
-  delay(100);
+  delay(100); 
+
 }
