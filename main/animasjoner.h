@@ -86,5 +86,173 @@ void skruAv() {
 //************          HELGEANIMASJON    ********************
 //************************************************************
 
+void HelgAnimasjon() {
+  const int NUM_BALLS = 2;            // To baller som kolliderer
+  const int NUM_STARS = 6;            // Flere ninja-stjerner
+  int delayTime = 10;                 // Forsinkelse for animasjonshastighet
+  unsigned long startTime = millis(); // Starttid for tidsbegrensning
+
+  // Regnbuebølge
+for (int cycle = 0; cycle < 3; cycle++) {
+    // Fade fra blå til hvit på første halvdel, hvit til blå på andre halvdel
+    for (int brightness = 0; brightness < 255; brightness += 5) {
+      for (int i = 0; i < NUMPIXELS; i++) {
+        if (i < NUMPIXELS/2) {
+          // Første halvdel: fade fra blå til hvit
+          strip.setPixelColor(i, strip.Color(brightness, brightness, 255));
+        } else {
+          // Andre halvdel: fade fra hvit til blå
+          strip.setPixelColor(i, strip.Color(255-brightness, 255-brightness, 255));
+        }
+      }
+      strip.show();
+      delay(10);
+    }
+    
+    // Fade tilbake
+    for (int brightness = 255; brightness >= 0; brightness -= 5) {
+      for (int i = 0; i < NUMPIXELS; i++) {
+        if (i < NUMPIXELS/2) {
+          // Første halvdel: fade fra hvit til blå
+          strip.setPixelColor(i, strip.Color(brightness, brightness, 255));
+        } else {
+          // Andre halvdel: fade fra blå til hvit
+          strip.setPixelColor(i, strip.Color(255-brightness, 255-brightness, 255));
+        }
+      }
+      strip.show();
+      delay(10);
+    }
+    
+    // Alternerende fade-effekt
+    for (int j = 0; j < 2; j++) {
+      // Fade inn annenhver LED
+      for (int brightness = 0; brightness < 255; brightness += 5) {
+        for (int i = 0; i < NUMPIXELS; i++) {
+          if (i % 2 == j) {
+            // Fade til hvit
+            strip.setPixelColor(i, strip.Color(255, 255, brightness));
+          } else {
+            // Hold blå
+            strip.setPixelColor(i, strip.Color(0, 0, 255));
+          }
+        }
+        strip.show();
+        delay(10);
+      }
+      
+      // Fade ut annenhver LED
+      for (int brightness = 255; brightness >= 0; brightness -= 5) {
+        for (int i = 0; i < NUMPIXELS; i++) {
+          if (i % 2 == j) {
+            // Fade til blå
+            strip.setPixelColor(i, strip.Color(0, 0, brightness));
+          } else {
+            // Hold blå
+            strip.setPixelColor(i, strip.Color(0, 0, 255));
+          }
+        }
+        strip.show();
+        delay(10);
+      }
+    }
+  }
+
+  // Bouncing ball-animasjon med haleeffekt
+  float positions[NUM_BALLS] = {0, NUMPIXELS - 1};  // Startposisjon for hver ball
+  float velocities[NUM_BALLS] = {0.5, -0.5};        // Ballene starter mot hverandre
+  int colors[NUM_BALLS][3];                         // RGB-farge for hver ball
+  int trails[NUM_BALLS] = {10, 10};                 // Halelengde for hver ball
+
+  // Initialiser hver ball med tilfeldig farge
+  for (int i = 0; i < NUM_BALLS; i++) {
+    colors[i][0] = random(100, 255);                // Rød komponent
+    colors[i][1] = random(100, 255);                // Grønn komponent
+    colors[i][2] = random(100, 255);                // Blå komponent
+  }
+
+  // Initialiser ninja-stjerner med raskere bevegelse
+  float starPositions[NUM_STARS] = {5, 15, 25, 35, 45, 55}; // Startposisjon for hver stjerne
+  float starSpeed = 1.5;                                   // Høyere hastighet for stjernene
+  int starTrails[NUM_STARS] = {8, 8, 8, 8, 8, 8};          // Halelengde for hver stjerne
+  int starColors[NUM_STARS][3];                            // RGB-farge for hver stjerne
+
+  // Tilfeldige farger for stjerner
+  for (int i = 0; i < NUM_STARS; i++) {
+    starColors[i][0] = random(200, 255);                   // Lysere rødfarge
+    starColors[i][1] = random(200, 255);                   // Lysere grønnfarge
+    starColors[i][2] = random(200, 255);                   // Lysere blåfarge
+  }
+
+  // Animasjon med tidsbegrensning på ett minutt
+  while (millis() - startTime < 60000) {
+    strip.clear();  // Tøm stripen hver ramme
+
+    // Oppdater baller
+    for (int i = 0; i < NUM_BALLS; i++) {
+      positions[i] += velocities[i]; // Oppdater posisjon
+
+      // Kollisjonsdeteksjon mellom ballene
+      if (abs(positions[0] - positions[1]) < 1) {
+        int tempColor[3] = {colors[0][0], colors[0][1], colors[0][2]};
+        colors[0][0] = colors[1][0];
+        colors[0][1] = colors[1][1];
+        colors[0][2] = colors[1][2];
+        colors[1][0] = tempColor[0];
+        colors[1][1] = tempColor[1];
+        colors[1][2] = tempColor[2];
+        velocities[0] *= -1;
+        velocities[1] *= -1;
+      }
+
+      if (positions[i] >= NUMPIXELS - 1 || positions[i] <= 0) {
+        velocities[i] *= -1;
+        positions[i] = constrain(positions[i], 0, NUMPIXELS - 1);
+      }
+
+      int pos = int(positions[i]);
+      strip.setPixelColor(pos, strip.Color(colors[i][0], colors[i][1], colors[i][2]));
+
+      for (int t = 1; t < trails[i]; t++) {
+        int trailPos = pos - (t * (velocities[i] > 0 ? 1 : -1));
+        if (trailPos >= 0 && trailPos < NUMPIXELS) {
+          int fadeValue = map(t, 0, trails[i], 255, 50);
+          strip.setPixelColor(trailPos, strip.Color(
+            (colors[i][0] * fadeValue) / 255,
+            (colors[i][1] * fadeValue) / 255,
+            (colors[i][2] * fadeValue) / 255
+          ));
+        }
+      }
+    }
+
+    // Oppdater ninja-stjerner
+    for (int i = 0; i < NUM_STARS; i++) {
+      starPositions[i] += starSpeed; // Beveg stjernen mot høyre
+
+      if (starPositions[i] >= NUMPIXELS) {
+        starPositions[i] = 0;
+      }
+
+      int starPos = int(starPositions[i]);
+      strip.setPixelColor(starPos, strip.Color(starColors[i][0], starColors[i][1], starColors[i][2]));
+
+      for (int t = 1; t < starTrails[i]; t++) {
+        int trailPos = starPos - t;
+        if (trailPos >= 0) {
+          int fadeValue = map(t, 0, starTrails[i], 255, 50);
+          strip.setPixelColor(trailPos, strip.Color(
+            (starColors[i][0] * fadeValue) / 255,
+            (starColors[i][1] * fadeValue) / 255,
+            (starColors[i][2] * fadeValue) / 255
+          ));
+        }
+      }
+    }
+
+    strip.show();
+    delay(delayTime);
+  }
+}
 
 #endif
