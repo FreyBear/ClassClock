@@ -5,6 +5,9 @@ Arduino based count down clock that shows remaining time of current class and br
 
 
 Credits:
+
 Klasse 1ELER på Godalen VGS
+
   Ingve (Kontaktlærer)
+  
   Hans Kristian jeg lagde hardware til prosjektet
