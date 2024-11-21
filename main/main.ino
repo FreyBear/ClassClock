@@ -59,6 +59,13 @@ void loop() {
 
   // STILL KLOKKEN! Skriv "tid" for å stille
 
+  if (Serial.available()) {
+    String kommando = Serial.readStringUntil('\n');
+    if (kommando == "tid") {
+      stillKlokke();
+    }
+  }
+
 
   DateTime now = rtc.now();
   gjeldende = fagNummer(now, plan);
@@ -148,5 +155,6 @@ void loop() {
   nedTelling(igjen, fagFarge[gjeldende]); 
 
   strip.show();
-  delay(100);
+  delay(100); 
+
 }
