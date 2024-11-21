@@ -5,7 +5,7 @@
 #define PIN 25 // Pinnen vi bruker til Neopixlene
 // Det er en feil i biblioteket her på WOKWI så vi må simulere med 69 pixler
 #define NUMPIXELS 68 // Antall neopixler på en hel sirkel
-
+//kommenter
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 RTC_DS1307 rtc;
