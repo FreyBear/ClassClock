@@ -1,3 +1,4 @@
+// Inklydere biblioteker:
 #include <Adafruit_NeoPixel.h>
 #include <Wire.h>
 #include "RTClib.h"
