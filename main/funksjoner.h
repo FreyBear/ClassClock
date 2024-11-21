@@ -103,6 +103,7 @@ void klokke(int tim, int min, int sek) {
 //************            FAG             ********************
 //************************************************************
 
+
 String fag(DateTime now, timePlan plan[])
 {
   const String fagList[] = {"Ingenting", "Friminutt", "El. kretser og nettverk",
@@ -176,12 +177,31 @@ byte fagNummer(DateTime now, timePlan plan[]){
 //************          STILL KLOKKE      ********************
 //************************************************************
 
+void stillKlokke() {
+  Serial.println("Skriv inn nytt klokkeslett (hh:mm:ss):");
+  while (Serial.available() == 0); // Vent på input fra brukeren
+ 
+  String tidInput = Serial.readStringUntil('\n'); // Les inn input fra brukeren
+  int timer, minutt, sekund;
+  sscanf(tidInput.c_str(), "%d:%d:%d", &timer, &minutt, &sekund); // Parse tiden
+ 
+  Serial.println("Skriv inn ukedag (1-7, der 1=mandag og 7=søndag):");
+  while (Serial.available() == 0); // Vent på input fra brukeren
+ 
+  int ukedag = Serial.parseInt() + 1; // Les inn ukedagen
+ 
+  // Oppdater RTC-klokken
+  DateTime nyTid = DateTime(2023, 1, ukedag, timer, minutt, sekund); // Dummy dato
+  rtc.adjust(nyTid);
+  Serial.println("Klokken er oppdatert!");
+}
 
 //************************************************************
 //************ Sekunder igjen av timen    ********************
 //************************************************************
 
-int tidIgjen(int currentDay, int currentHour, int currentMinute, int currentSecond){
+
+  int tidIgjen(int currentDay, int currentHour, int currentMinute, int currentSecond){
     int currentfag = -1;
     for (int i = 0; i < 40; i++) {
       if (plan[i].ukedag == currentDay) {
@@ -213,11 +233,11 @@ int tidIgjen(int currentDay, int currentHour, int currentMinute, int currentSeco
       //Serial.println("Ingen fag");
     }
   }
-  
 
 //************************************************************
 //************        NEDTELLING          ********************
 //************************************************************
+
 void nedTelling(int igjen, uint32_t farge) {
 
   int tidNa = rtc.now().minute() * 60 + rtc.now().second();
@@ -230,5 +250,34 @@ void nedTelling(int igjen, uint32_t farge) {
   }
 }
 
+//************************************************************
+//************        WIFI & TIME          *******************
+//************************************************************
+void setTimezone(String timezone){
+  Serial.printf("  Setting Timezone to %s\n",timezone.c_str());
+  setenv("TZ",timezone.c_str(),1);  //  Now adjust the TZ.  Clock settings are adjusted to show the new local time
+  tzset();
+}
+void initTime(String timezone){
+  struct tm timeinfo;
 
+  Serial.println("Setting up time");
+  configTime(0, 0, "pool.ntp.org");    // First connect to NTP server, with 0 TZ offset
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("  Failed to obtain time");
+    return;
+  }
+  Serial.println("  Got the time from NTP");
+  // Now we can set the real timezone
+  setTimezone(timezone);
+}
+
+void printLocalTime(){
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time 1");
+    return;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S zone %Z %z ");
+}
 #endif

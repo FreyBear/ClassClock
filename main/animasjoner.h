@@ -336,5 +336,4 @@ for (int cycle = 0; cycle < 3; cycle++) {
     delay(delayTime);
   }
 }
-
 #endif
