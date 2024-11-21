@@ -103,8 +103,41 @@ void klokke(int tim, int min, int sek) {
 //************            FAG             ********************
 //************************************************************
 
+String fag(DateTime now, timePlan plan[])
+{
+  const String fagList[] = {"Ingenting", "Friminutt", "El. kretser og nettverk",
+                            "Energi og styresystemer", "Norsk", "Engelsk", "Matte",
+                            "Naturfag", "Gym"};
 
+  byte dag = now.dayOfTheWeek();
+  if (dag == 0 || dag == 6) {
+    return "Det er helg i dag.";
+  }
 
+  for (int i = 0; i < 40; i++) {
+    if (dag == plan[i].ukedag) {
+      // Calculate the end time of the lesson
+      String startTid = plan[i].startTid;
+      byte varighet = plan[i].varighet;
+      
+      // Convert start time to minutes
+      int startHour = startTid.substring(0, 2).toInt();
+      int startMinute = startTid.substring(3, 5).toInt();
+      int startTotalMinutes = startHour * 60 + startMinute;
+
+      // Convert current time to minutes
+      int currentTotalMinutes = now.hour() * 60 + now.minute();
+
+      // Check if current time falls within the lesson time frame
+      if (currentTotalMinutes >= startTotalMinutes && currentTotalMinutes < startTotalMinutes + varighet) {
+        byte fagIndex = plan[i].fag;
+        return fagList[fagIndex];
+      }
+    }
+  }
+
+  return fagList[0];
+}
 
 //************************************************************
 //************        FAGNUMMER           ********************
