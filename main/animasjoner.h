@@ -45,8 +45,90 @@ void alarm(uint32_t c, uint8_t wait) {
 //************   ANIMASJON FOR FRIMINUTT  ********************
 //************************************************************
 
+// Funksjon for å kjøre en pulserende lys-effekt
+void friminuttAnimasjon() {
+  Serial.println("Starter friminutt animasjon");
+
+  int center = NUMPIXELS / 2;                  // Finn midtpunktet av NeoPixel-stripen
+  
+  // Farger for de ulike effektene, fordelt for variasjon
+  uint32_t color1 = strip.Color(255, 0, 0);    // Rød
+  uint32_t color2 = strip.Color(0, 0, 255);    // Blå
+  uint32_t color4 = strip.Color(255, 255, 0);  // Gul
+  uint32_t color5 = strip.Color(255, 165, 0);  // Oransje
+  uint32_t color6 = strip.Color(255, 20, 147); // Rosa
+
+  // Del 1: Roterende regnbueeffekt fra midten ut til kantene
+  for (int spread = 0; spread < NUMPIXELS / 2; spread++) {
+    for (int i = 0; i <= spread; i++) {
+      strip.setPixelColor(center - i, color1); // Fyll fra midten til venstre
+      strip.setPixelColor(center + i, color2); // Fyll fra midten til høyre
+    }
+    strip.show(); delay(20);
+    color1 = strip.Color(random(255), random(255), random(255)); // Endre farge for variert effekt
+    color2 = strip.Color(random(255), random(255), random(255));
+  }
+
+  for (int blink = 0; blink < 5; blink++) {
+  for (int i = 0; i < NUMPIXELS; i++) {
+    // Veksle mellom gul, oransje og rosa i et blinkemønster
+    if (blink % 3 == 0) {
+      strip.setPixelColor(i, color4); // Gul hver tredje blink
+    } else if (blink % 3 == 1) {
+      strip.setPixelColor(i, color5); // Oransje
+    } else {
+      strip.setPixelColor(i, color6); // Rosa
+    }
+  }
+  strip.show();
+  delay(50);
+  strip.clear();
+  strip.show();
+  delay(50);
+ }
+
+  // Del 3: Bølgeeffekt som beveger seg langs stripen med fargene gul, rosa og oransje
+ for (int wave = 0; wave < NUMPIXELS / 3; wave++) {  // Forkortet bølgelengde
+  for (int i = 0; i < NUMPIXELS; i++) {
+    // Bestem fargen basert på bølgeposisjonen for en levende overgang
+    if ((i + wave) % 3 == 0) {
+      strip.setPixelColor(i, strip.Color(255, 255, 0)); // Gul
+    } else if ((i + wave) % 3 == 1) {
+      strip.setPixelColor(i, strip.Color(255, 20, 147)); // Rosa
+    } else {
+      strip.setPixelColor(i, strip.Color(255, 165, 0)); // Oransje
+    }
+  }
+  strip.show();
+  delay(40); // Økt delay for å korte ned på total varighet
+ }
 
 
+  // Del 4: Fargebølge som beveger seg rundt stripen med oransje og rosa
+  for (int wave = 0; wave < 10; wave++) {
+    for (int i = 0; i < NUMPIXELS; i++) {
+      strip.setPixelColor(i, (i + wave) % 4 == 0 ? color4 : color5); // Veksle mellom oransje og rosa
+    }
+    strip.show();
+    delay(50);
+  }
+
+  // Del 5: Fading til av med alle farger
+  for (int brightness = 255; brightness >= 0; brightness -= 12) {
+    for (int i = 0; i < NUMPIXELS; i++) {
+      uint32_t currentColor = strip.getPixelColor(i);
+      uint8_t r = (currentColor >> 16) & 0xFF;
+      uint8_t g = (currentColor >> 8) & 0xFF;
+      uint8_t b = currentColor & 0xFF;
+      strip.setPixelColor(i, strip.Color(r * brightness / 255, g * brightness / 255, b * brightness / 255));
+    }
+    strip.show();
+    delay(20);
+  }
+
+  strip.clear();
+  strip.show(); // Slå av alle lysene til slutt
+}
 
 //************************************************************
 //************ ANIMASJON FERDIG FOR DAGEN ********************
