@@ -23,6 +23,17 @@ bool erHelg = false;      // Blir True når det er helg
 byte gjeldende = 0;    // Gjeldende aktivitet, Aktiviteten som er akkurat nå
 byte forrige = 0;      // Forrige aktivitet, Aktiviteten vi hadde for 1 millisekund siden
 
+uint32_t fagFarge[10] = {
+  strip.Color(0, 0, 0), 
+  strip.Color(0,255,0),
+  strip.Color(102,205,170),
+  strip.Color(0,128,128),
+  strip.Color(205,92,92),
+  strip.Color(255,0,0),
+  strip.Color(60,179,113),
+  strip.Color(0,100,0),
+  strip.Color(188,143,143)
+};
 
 
 int igjen = 0;

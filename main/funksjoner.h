@@ -187,7 +187,17 @@ byte fagNummer(DateTime now, timePlan plan[]){
 //************************************************************
 //************        NEDTELLING          ********************
 //************************************************************
+void nedTelling(int igjen, uint32_t farge) {
 
+  int tidNa = rtc.now().minute() * 60 + rtc.now().second();
+  int tidNaPixel = map(tidNa,0,3599,0,NUMPIXELS);
+  int endepunkt = tidNa + igjen;
+  int endepunktPixel = map(endepunkt,0,3599,0,NUMPIXELS-1);
+  
+  for (int i = tidNaPixel; i <= endepunktPixel; i++) {
+    strip.setPixelColor(i % NUMPIXELS, farge);
+  }
+}
 
 
 #endif
