@@ -181,7 +181,38 @@ byte fagNummer(DateTime now, timePlan plan[]){
 //************ Sekunder igjen av timen    ********************
 //************************************************************
 
+int tidIgjen(int currentDay, int currentHour, int currentMinute, int currentSecond){
+    int currentfag = -1;
+    for (int i = 0; i < 40; i++) {
+      if (plan[i].ukedag == currentDay) {
+        int fagStartMinutes = plan[i].startTid.substring(0, 2).toInt() * 60 + plan[i].startTid.substring(3, 5).toInt();
+        int fagEndMinutes = fagStartMinutes + plan[i].varighet;
+        int currentMinutes = currentHour * 60 + currentMinute;
 
+        if (currentMinutes >= fagStartMinutes && currentMinutes < fagEndMinutes) {
+          currentfag = i;
+          break;
+        }
+      }
+    }
+
+    if (currentfag != -1) {
+      int fagStartMinutes = plan[currentfag].startTid.substring(0, 2).toInt() * 60 + plan[currentfag].startTid.substring(3, 5).toInt();
+      int fagEndMinutes = fagStartMinutes + plan[currentfag].varighet;
+      int currentMinutes = currentHour * 60 + currentMinute;
+      int currentTotalSeconds = currentMinutes * 60 + currentSecond;
+      int fagEndTotalSeconds = fagEndMinutes * 60;
+
+      int remainingTime = fagEndTotalSeconds - currentTotalSeconds;
+
+      return remainingTime;
+      //Serial.print(remainingTime);
+      //Serial.println(" sekunder igjen");
+    } else {
+      return 0;
+      //Serial.println("Ingen fag");
+    }
+  }
   
 
 //************************************************************
